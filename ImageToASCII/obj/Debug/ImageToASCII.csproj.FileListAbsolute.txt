@@ -1,0 +1,10 @@
+D:\Adrian Bece Designs\Programming\ImageToASCII\ImageToASCII\bin\Debug\ImageToASCII.exe
+D:\Adrian Bece Designs\Programming\ImageToASCII\ImageToASCII\bin\Debug\ImageToASCII.pdb
+D:\Adrian Bece Designs\Programming\ImageToASCII\ImageToASCII\obj\Debug\ImageToASCII.csprojResolveAssemblyReference.cache
+D:\Adrian Bece Designs\Programming\ImageToASCII\ImageToASCII\obj\Debug\ImageToASCII.Form1.resources
+D:\Adrian Bece Designs\Programming\ImageToASCII\ImageToASCII\obj\Debug\ImageToASCII.Properties.Resources.resources
+D:\Adrian Bece Designs\Programming\ImageToASCII\ImageToASCII\obj\Debug\ImageToASCII.csproj.GenerateResource.Cache
+D:\Adrian Bece Designs\Programming\ImageToASCII\ImageToASCII\obj\Debug\ImageToASCII.exe
+D:\Adrian Bece Designs\Programming\ImageToASCII\ImageToASCII\obj\Debug\ImageToASCII.pdb
+D:\Adrian Bece Designs\Programming\ImageToASCII\ImageToASCII\obj\Debug\ImageToASCII.IPCamSelect.resources
+D:\Adrian Bece Designs\Programming\ImageToASCII\ImageToASCII\bin\Debug\ImageToASCII.exe.config
