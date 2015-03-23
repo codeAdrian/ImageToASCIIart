@@ -33,16 +33,17 @@ namespace ImageToASCII
         private void getCamPicture(object s, EventArgs e)
         {
 
-            Invoke((MethodInvoker)delegate //Anonimna metoda 
+            Invoke((MethodInvoker)delegate
             {
                 time.Reset();
                 time.Start();
                 var request = WebRequest.Create(ipCamURL);
-                using (var response = (HttpWebResponse)request.GetResponse()) // request se ponistava nakon sto se izvrsi
+                using (var response = (HttpWebResponse)request.GetResponse()) // Request
                 {
-                    using (var stream = response.GetResponseStream()) // stream se ponistava kada se izvrsi
+                    using (var stream = response.GetResponseStream()) // Get image from ipCam
                         img = Image.FromStream(stream);
                 }
+                // save captured image and convert it
                 bmp = new Bitmap(img, width, height);
                 pbx_image.Image = img;
                 pbx_image.SizeMode = PictureBoxSizeMode.Zoom;
@@ -65,11 +66,7 @@ namespace ImageToASCII
 
         private void convert_image(Bitmap bmp)
         {
-            // Prvi nacin - u glavnoj niti
-            // Drugi nacin - sporiji - svaki char posebno
-            // Treci nacin - posebna nit u pozadini. sporije.
-            // new Thread(() =>{
-            // Thread.CurrentThread.IsBackground = true;
+            // image conversion algorithm
             asciiImage.Length = 0;
             asciiImage.Capacity = 0;
             bmpHeight = bmp.Height;
@@ -77,8 +74,6 @@ namespace ImageToASCII
             int yRise = bmpHeight / height;
             int xRise = bmpWidth / width;
 
-            // drugi algoritam za usporedbu. svaki char posebno salji na rich textbox (sporije ce biti).
-            // obrisati stringbuilder, nit, start i stavi da se umjesto asciiImage.Text+=slovo
             time.Reset();
             time.Start();
             for (int y = 0; y < bmpHeight; y = y + yRise)
@@ -86,6 +81,7 @@ namespace ImageToASCII
                 for (int x = 0; x < bmpWidth; x = x + xRise)
                 {
                     Color clr = bmp.GetPixel(x, y);
+                    // convert image to grayscale with RGB average (fast and precise)
                     if (cbx_invert.Checked == true) colorAverage = 255 - (tbar_brightness.Value + (clr.R + clr.G + clr.B) / 3);
                     else colorAverage = tbar_brightness.Value + (clr.R + clr.G + clr.B) / 3;
                     asciiImage.Append(getAsciiChar(colorAverage).ToString());
@@ -93,17 +89,18 @@ namespace ImageToASCII
                 asciiImage.Append(Environment.NewLine);
             }
             rtbx_ascii.ResetText();
+            // show ASCII art in textbox
             rtbx_ascii.Text = asciiImage.ToString();
             time.Stop();
             btn_convert.Enabled = true;
             label_time.Text = "Processing time: " + time.ElapsedMilliseconds + " ms";
-            //  }).Start();
         }
 
         private char getAsciiChar(int colorAverage)
         {
+            // reduced character library
             if (cbx_reduceCharLib.Checked == true)
-            { // 11 znakova
+            { 
                 if (colorAverage >= 235) return '.';
                 if (colorAverage >= 200) return ';';
                 if (colorAverage >= 170) return '>';
@@ -117,7 +114,7 @@ namespace ImageToASCII
                 return '@';
             }
 
-            else // 44 znaka
+            else // full character library
             {
                 if (colorAverage >= 235) return '.';
                 if (colorAverage >= 225) return '`';
@@ -168,6 +165,7 @@ namespace ImageToASCII
 
         private void btn_file_Click(object sender, EventArgs e)
         {
+            // load image
             OpenFileDialog file = new OpenFileDialog();
             file.RestoreDirectory = true;
             file.Filter = "Image Files (*.bmp, *.jpg, *.png, *.gif, *jpeg)|*.bmp;*.jpg;*.png;*.gif;*.jpeg";
@@ -208,6 +206,7 @@ namespace ImageToASCII
 
         private void btn_convert_Click(object sender, EventArgs e)
         {
+            // convert uploaded image
             if (img == null && rb_file.Checked == true) MessageBox.Show("Please select the image you want to convert to ASCII", "No image selected");
             else
             {
@@ -241,6 +240,7 @@ namespace ImageToASCII
 
         private void btn_stop_Click(object sender, EventArgs e)
         {
+            // stop IPcam stream
             t.Stop();
             btn_convert.Enabled = true;
             btn_stop.Enabled = false;
@@ -248,6 +248,8 @@ namespace ImageToASCII
 
         private void menu_exportText_Click(object sender, EventArgs e)
         {
+            // export ASCII art
+
             SaveFileDialog savePath = new SaveFileDialog();
             savePath.Filter = "Text files (*.txt)|*.txt";
             savePath.FilterIndex = 1;
@@ -288,26 +290,20 @@ namespace ImageToASCII
 
         private Image DrawText(String text, Font font, Color textColor, Color backColor)
         {
-            //first, create a dummy bitmap just to get a graphics object
             Image img = new Bitmap(1, 1);
             Graphics drawing = Graphics.FromImage(img);
 
-            //measure the string to see how big the image needs to be
             SizeF textSize = drawing.MeasureString(text, font);
 
-            //free up the dummy image and old graphics object
             img.Dispose();
             drawing.Dispose();
 
-            //create a new image of the right size
             img = new Bitmap((int)textSize.Width, (int)textSize.Height);
 
             drawing = Graphics.FromImage(img);
 
-            //paint the background
             drawing.Clear(backColor);
 
-            //create a brush for the text
             Brush textBrush = new SolidBrush(textColor);
 
             drawing.DrawString(text, font, textBrush, 0, 0);
@@ -332,7 +328,7 @@ namespace ImageToASCII
             return null;
         }
 
-        // JPG eksport
+        // JPG export
         private void menu_exportJPG_Click(object sender, EventArgs e)
         {
             if (img != null)
@@ -366,8 +362,7 @@ namespace ImageToASCII
             }
         }
 
-        //rotirati ucitanu sliku i ponovo pretvoriti sliku u ASCII
-        //rotacija za 90, kazaljke na satu
+        // rotate and convert image
         private void degreesClockwiseToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (img != null)
@@ -382,7 +377,7 @@ namespace ImageToASCII
             }
         }
 
-        //rotacija za 90, suprotno od kazaljke na satu
+        // rotate and convert image
         private void degreesCounterclockwiseToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (img != null)
@@ -397,7 +392,7 @@ namespace ImageToASCII
             }
         }
 
-        //rotacija za 180
+        // rotate and convert image
         private void degreesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (img != null)
@@ -412,6 +407,7 @@ namespace ImageToASCII
             }
         }
 
+        // flip and convert image
         private void menu_flipHorizontal_Click(object sender, EventArgs e)
         {
             if (img != null)
@@ -426,6 +422,7 @@ namespace ImageToASCII
             }
         }
 
+        // flip and convert image
         private void menu_flipVertical_Click(object sender, EventArgs e)
         {
             if (img != null)
@@ -440,7 +437,7 @@ namespace ImageToASCII
             }
         }
 
-        // provjera da li je upisan int na Unfocus eventu
+        // textbox value validation
         private void tbx_width_Leave(object sender, EventArgs e)
         {
             if (int.TryParse(tbx_width.Text, out width)) { }
@@ -461,6 +458,7 @@ namespace ImageToASCII
             }
         }
 
+        // compress string
         static byte[][] Compress(string[] array)
         {
             byte[][] output = new byte[array.Length][];
@@ -492,6 +490,7 @@ namespace ImageToASCII
             return Convert.ToBase64String(gZipBuffer);
         }
 
+        // decompress string
         public static string DecompressString(string compressedText)
         {
             byte[] gZipBuffer = Convert.FromBase64String(compressedText);
